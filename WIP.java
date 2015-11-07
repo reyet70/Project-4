@@ -60,11 +60,9 @@ void setup() {
   four.words= "Rat";
   //
   brd= new Bird();
-  brd.x = -50;
   brd.y = 90;
-  brd.fly = false;
-  brd.drop = false;
-
+  brd.by = 95;
+  
   
   reset();
 }
@@ -188,27 +186,27 @@ class Ball {
   }
   void move() {
     if (t.wall) {
-      if (x>t.right-4 || x<t.middle+20) {  dx=  -dx; }
-    }else{
+      if (x>t.right-4 || x<t.middle+20) {  dx=  -dx; }    //where the balls bounce off of depending on
+    }else{                                                //whether the wall is engaged or not
       if (x>t.right-4 || x<t.left+4) {  dx=  -dx; }
     }
     if (y>t.bottom-4 || y<t.top+4) {  dy=  -dy; }
     x=  x+dx;
     y=  y+dy;
   }
-  void reset() {
-    x=  random( (width/2)+50, t.right );
+  void reset() {                //resets the ball on right side random position with random velocity
+    x=  random( (width/2)+50, t.right );    
     y=  random( t.top, t.bottom );
     dx=  random( -5,5 );
     dy=  random( -3,3 );
   }
-  void resetCue() {
+  void resetCue() {            //reset for the cue ball on the left side centered with no velocity
     x= width/4;
     y= (t.bottom+t.top)/2;
     dx= 0; dy= 0;
   }
-  boolean hit( float x, float y ) {
-    if (  dist( x,y, this.x,this.y ) < 30 ) return true;
+  boolean hit( float x, float y ) {                        //if distance between two balls is less than thirty, set hit = true
+    if (  dist( x,y, this.x,this.y ) < 30 ) return true;   //if hit = true, triggers the collision function which swaps velocities
     else return false;
   }
 }
@@ -221,9 +219,9 @@ class PTable {
   
   //METHODS
   void tableDisplay(){
-    fill( 100, 250, 100 );    // green pool table
+    fill( 100, 250, 100 );    
     strokeWeight(20);
-    stroke( 127, 0, 0 );      // Brown walls
+    stroke( 127, 0, 0 );      // walls of pool talbe
     rectMode( CORNERS );
     rect( left-20, top-20, right+20, bottom+20 );
     stroke(0);
@@ -242,16 +240,30 @@ class Bird {
   int frame;
   boolean fly, drop;
   
+  Bird() {
+    fly = false;
+    drop = false;
+    x = -50;
+    bDY = 2;
+  }
+  // movement for the bird. when the bird crosses the right edge of the screen, it 
+  // resets a ton of variables all tied to the bird flight and bomb droping mechanic
   void moveBird(){
     if (fly)
     x +=4;
     if (x>width+50){
       x= -50;
-      fly = false;
+      fly = false;             //causes the bird to fly when true
+      drop =false;             //causes the bomb to drop when true
+      three.counter = false;   //when true, starts the buffer counter
+      three.buffer = 0;        //counts up when counter is true, enables drop to use the same button as fly on subsequent clicks
+      by = 90;
+      bDY = 2;
+      
     }
   }
-  
-  void showBird(){
+  //Animation and display for birds. Frame count is for wing animation
+  void showBird(){                 
     frame +=1;
     stroke(0);
     strokeWeight(1);
@@ -270,14 +282,17 @@ class Bird {
      triangle(x-4, y-8, x-13, y+7, x+7, y-5);
     }
   }
+  //draws bomb and sends it downward with increasing velocity
   void bombDrop(){
     if (drop == true){
         noStroke();
         fill(105);
-        rect(x,y,10,10);
-        ellipse(x+5,y,10,10);
-        ellipse(x+5,y+10,10,10);
-        triangle(x+5,y, x,y-13, x+10, y-13);
+        rect(x,by,10,10);
+        ellipse(x+5,by,10,10);
+        ellipse(x+5,by+10,10,10);
+        triangle(x+5,by, x,by-13, x+10,by-13);
+        by += bDY;
+        bDY += .25;
     }
   }
       
@@ -306,25 +321,32 @@ class Button {
     fill(255);
     text( words, x+15, y+20);
   }
+  //resets balls and wall
   void buttonReset(){
     if (mouseX >x && mouseX<x+80 && mouseY>y && mouseY<y+40){
     reset();
   }
  }
+ //disables wall
  void buttonWall(){
   if (mouseX >x && mouseX<x+80 && mouseY>y && mouseY<y+40){
     t.wall = false;
   }
  }
+ //multifunctional button. Sends the bird flying on the first click
+ //and drops a bomb on the second click, then does nothing untill the
+ //bird completes its flight.
  void buttonBird(){
    if (mouseX >x && mouseX<x+80 && mouseY>y && mouseY<y+40){
      brd.fly = true;
      counter = true;
-     if (buffer > 2){
+     if (buffer > 1){
        brd.drop = true;
      }
    }
  }
+ //Buffer counter for the bird button. Button will only enable drop if at least
+ //two frames have passed since fly was enabled.
  void buttonBirdBuffer(){
    if (counter == true) {
      buffer +=1;
