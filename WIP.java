@@ -4,18 +4,17 @@
 //// objects, loops, and arrays
 
 Ball a,b,c,d,e,q;
+PTable t;
 
-float left, right, top, bottom;
-float middle;
-
-//// SETUP:  size and table
+//SETUP: object stuff
 void setup() {
   size( 600, 400 );
-  left=   50;
-  right=  width-50;
-  top=    100;
-  bottom= height-50;
-  middle= left + (right-left) / 2;
+  t= new PTable();
+  t.left=   50;
+  t.right=  width-50;
+  t.top=    100;
+  t.bottom= height-50;
+  t.middle= t.left + (t.right-t.left) / 2;
   //
   a=  new Ball();
   a.r=255;
@@ -46,9 +45,11 @@ void setup() {
   q.b=255;
   q.name=  " ";
   //
+  
   reset();
 }
 
+//RESET function for balls
 void reset() {
   a.reset();
   b.reset();
@@ -58,14 +59,14 @@ void reset() {
   q.resetCue();
 }
  
-//// NEXT FRAME:  table, bounce off walls, collisions, show all
+//main DRAW function
 void draw() {
   background( 250,250,200 );
-  rectMode( CORNERS );
-  table( left, top, right, bottom );
+  t.tableDisplay();
   balls();
 }
 
+// handles the COLLISION, MOVEMENT, and DISPLAY of balls
 void balls() {
   collision( a, b );
   collision( a, c );
@@ -101,16 +102,16 @@ void balls() {
   q.show();
 }
 
-//// Elastic collisions.
+// SWAP VELOCITIES for the collisions
 void collision( Ball p, Ball q ) {
   if ( p.hit( q.x,q.y ) ) {
     float tmp;
-    tmp=p.dx;  p.dx=q.dx;  q.dx=tmp;      // Swap the velocities.
+    tmp=p.dx;  p.dx=q.dx;  q.dx=tmp;     
     tmp=p.dy;  p.dy=q.dy;  q.dy=tmp; 
   }
 }
 
-//// HANDLERS:  keys & clicks.
+// KEY PRESSED stuff: exit, reset, other buttons
 void keyPressed() {
   if (key == 'q') exit();
   if (key == 'r') {
@@ -123,25 +124,15 @@ void keyPressed() {
   }
 }
 
-//// SCENE:  draw the table with walls
-void table( float left, float top, float right, float bottom ) {
-  fill( 100, 250, 100 );    // green pool table
-  strokeWeight(20);
-  stroke( 127, 0, 0 );      // Brown walls
-  rect( left-20, top-20, right+20, bottom+20 );
-  stroke(0);
-  strokeWeight(1);
-}
 
+//BALL CLASS
 class Ball {
-  //// PROPERTIES:  position, speed, color, etc. ////   (What a Ball "has".)
+  // PROPERTIES
   float x,y, dx,dy;
   int r,g,b;
   String name="";
   
-  //// CONSTRUCTORS (if any). ////
-  
-  //// METHODS:  show, move, detect a "hit", etc. ////  (What a Ball "does".)
+  // METHODS
   void show() {
     fill(r,g,b);
     ellipse( x,y, 30,30 );
@@ -149,20 +140,20 @@ class Ball {
     text( name, x-5,y );
   }
   void move() {
-    if (x>right || x<left) {  dx=  -dx; }
-    if (y>bottom || y<top) {  dy=  -dy; }
+    if (x>t.right || x<t.left) {  dx=  -dx; }
+    if (y>t.bottom || y<t.top) {  dy=  -dy; }
     x=  x+dx;
     y=  y+dy;
   }
   void reset() {
-    x=  random( width/2, right );
-    y=  random( top, bottom );
+    x=  random( width/2, t.right );
+    y=  random( t.top, t.bottom );
     dx=  random( -5,5 );
     dy=  random( -3,3 );
   }
   void resetCue() {
     x= width/4;
-    y= (bottom+top)/2;
+    y= (t.bottom+t.top)/2;
     dx= 0; dy= 0;
   }
   boolean hit( float x, float y ) {
@@ -170,3 +161,21 @@ class Ball {
     else return false;
   }
 }
+
+//PTABLE CLASS
+class PTable {
+  //PROPERTIES
+  float left, right, top, bottom, middle;
+  
+  //METHODS
+  void tableDisplay(){
+    fill( 100, 250, 100 );    // green pool table
+    strokeWeight(20);
+    stroke( 127, 0, 0 );      // Brown walls
+    rectMode( CORNERS );
+    rect( left-20, top-20, right+20, bottom+20 );
+    stroke(0);
+    strokeWeight(1);
+  }
+} 
+  
