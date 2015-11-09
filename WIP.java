@@ -6,6 +6,8 @@ Ball a,b,c,d,e,q;
 PTable t;
 Button one, two, three, four;
 Bird brd;
+Rat rt;
+int frame;
 
 //SETUP: object stuff
 void setup() {
@@ -62,7 +64,8 @@ void setup() {
   brd= new Bird();
   brd.y = 90;
   brd.by = 95;
-  
+  //
+  rt= new Rat();
   
   reset();
 }
@@ -85,12 +88,8 @@ void draw() {
   balls();
   buttons();
   birds();
-  fill(0);
-  if (brd.drop == false){
-  text("0", 50, height-50);
-  }else{
-  text("1", 50, height-50); 
-  }
+  rats();
+  frame +=1;
 }
 
 // handles the COLLISION, MOVEMENT, and DISPLAY of BALLS
@@ -152,6 +151,12 @@ void birds(){
   brd.showBird();
   brd.bombDrop();
 }
+
+void rats(){
+  rt.moveRat();
+  rt.showRat();
+}
+
 // KEY PRESSED stuff: exit, reset, other buttons
 void keyPressed() {
   if (key == 'q') exit();
@@ -165,6 +170,7 @@ void mousePressed() {
  one.buttonReset();
  two.buttonWall();
  three.buttonBird();
+ four.buttonRat();
 }
 
 
@@ -237,7 +243,6 @@ class PTable {
 
 class Bird {
   float x,y,by,bDY;
-  int frame;
   boolean fly, drop;
   
   Bird() {
@@ -264,7 +269,6 @@ class Bird {
   }
   //Animation and display for birds. Frame count is for wing animation
   void showBird(){                 
-    frame +=1;
     stroke(0);
     strokeWeight(1);
     fill(192);
@@ -295,9 +299,54 @@ class Bird {
         bDY += .25;
     }
   }
-      
-  
 }
+
+class Rat {
+  
+  float x,y,DX,DY;
+  boolean crawl;
+  
+  Rat() {
+    crawl = false;
+    x = -50;
+    y = random(170,height-50);
+  }
+  
+  void moveRat(){
+    if (crawl){
+      DX=random(0,5);
+      DY=random(-5,5);
+      x+=DX;
+      y+=DY;
+      if (x>width+50){
+        crawl = false;
+        x = -50;
+        y = random(170,height-50);
+      }
+    }
+  }
+  
+  void showRat(){
+    stroke(1);
+    fill(210,180,140);
+    ellipse(x,y,30,15);
+    ellipse(x+15,y,15,13);
+    fill(209,193,173);
+    ellipse(x+10,y-5,10,5);
+    ellipse(x+10,y+5,10,5);
+    fill(0);
+    ellipse(x+22,y,5,5);
+    noFill();
+    if (frame/15 % 2 == 0){
+      arc(x-22,y,15,15,0,PI);
+      arc(x-37,y,15,15,PI, TWO_PI);
+    }else if(frame/15 % 2 == 1){
+      arc(x-22,y,15,15,PI,TWO_PI);
+      arc(x-37,y,15,15,0,PI); 
+  }
+  }
+}
+
 class Button {
   //PROPERTIES
   float x,y;
@@ -352,7 +401,12 @@ class Button {
      buffer +=1;
        }   
      }
+ void buttonRat(){
+   if (mouseX >x && mouseX<x+80 && mouseY>y && mouseY<y+40){
+     rt.crawl = true;
    }
+ }
+}
  
 
   
