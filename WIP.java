@@ -1,5 +1,5 @@
 ////Nick Ferro
-//// Project 3   11-7-15    Prototyping
+//// Project 3   11-10-15    Prototyping
 //// Pool table elastic collisions
 //// objects and loops
 Ball a,b,c,d,e,q;
@@ -8,6 +8,7 @@ Button one, two, three, four;
 Bird brd;
 Rat rt;
 int frame;
+int score;
 
 //SETUP: object stuff
 void setup() {
@@ -18,6 +19,7 @@ void setup() {
   t.top=    150;
   t.bottom= height-50;
   t.middle= t.left + (t.right-t.left) / 2;
+  t.horizon= (height/4)-20;
   t.wall=true;
   //
   a=  new Ball();
@@ -62,8 +64,8 @@ void setup() {
   four.words= "Rat";
   //
   brd= new Bird();
-  brd.y = 90;
-  brd.by = 95;
+  brd.y = 70;
+  brd.by = 75;
   //
   rt= new Rat();
   
@@ -83,13 +85,25 @@ void reset() {
  
 //main DRAW function
 void draw() {
-  background( 250,250,200 );
+  background( 102,178,205 );
   t.tableDisplay();
+  drawGrass();
   balls();
   buttons();
   birds();
   rats();
   frame +=1;
+  showScore();
+}
+
+void drawGrass(){
+  int x = 0;
+  strokeWeight(2);
+  while (x <= width){
+    strokeWeight(1);
+    line(x, height, random(x-1,x+1), height-15);
+    x +=5;
+  }
 }
 
 // handles the COLLISION, MOVEMENT, and DISPLAY of BALLS
@@ -113,6 +127,13 @@ void balls() {
   collision( d, q );
   collision( e, q );
   //
+  ratCollision( a, rt);
+  ratCollision( b, rt);
+  ratCollision( c, rt);
+  ratCollision( d, rt);
+  ratCollision( e, rt);
+  ratCollision( q, rt);
+  //
   a.move();
   b.move();
   c.move();
@@ -133,6 +154,19 @@ void collision( Ball p, Ball q ) {
     float tmp;
     tmp=p.dx;  p.dx=q.dx;  q.dx=tmp;     
     tmp=p.dy;  p.dy=q.dy;  q.dy=tmp; 
+    score += 1;
+  }
+}
+
+void ratCollision( Ball p, Rat q ) {
+  if ( p.hit( q.x,q.y ) ) {
+    p.dx=0;
+    p.dy=0;
+    if (rt.scoreBuffer == false){          //convoluted fix for the problem with the rat collision scoring.
+      score -= 10;                         // b/c the rat doesn't instantly go in the opposite direction of the ball
+      rt.scoreBufferCounter = 0;           // there is a 'collision' for many frames in a row, causing the score to plumet.
+      rt.scoreBuffer = true;               // w/ the fix, the -10 score can only happen every 10 frames, usually enough time 
+    }                                      // for the rat to move away from the ball
   }
 }
 
@@ -155,6 +189,12 @@ void birds(){
 void rats(){
   rt.moveRat();
   rt.showRat();
+  rt.scoreFix();
+}
+
+void showScore(){
+  text("Score", 50, height-50);
+  text(score , 90, height -50);
 }
 
 // KEY PRESSED stuff: exit, reset, other buttons
@@ -162,7 +202,6 @@ void keyPressed() {
   if (key == 'q') exit();
   if (key == 'r') reset();
   if (key == 'w') t.wall = false;
-  if (key == 'b') brd.fly = true;
 }
 
 //MOUSEPRESSED: hits for the button functions
@@ -171,6 +210,13 @@ void mousePressed() {
  two.buttonWall();
  three.buttonBird();
  four.buttonRat();
+ a.clickBall();
+ b.clickBall();
+ c.clickBall();
+ d.clickBall();
+ e.clickBall();
+ q.clickCue();
+ rt.clickRat();
 }
 
 
@@ -211,6 +257,24 @@ class Ball {
     y= (t.bottom+t.top)/2;
     dx= 0; dy= 0;
   }
+  void clickBall(){
+    if (dist( mouseX, mouseY, x,y) < 15){
+       x=  random( (width/2)+50, t.right );    
+       y=  random( t.top, t.bottom );
+       dx=  random( -5,5 );
+       dy=  random( -3,3 );
+       score -=5;
+    }
+  }
+  void clickCue(){
+    if (dist( mouseX, mouseY, x,y) < 15){
+       x= width/4;
+       y= (t.bottom+t.top)/2;
+       dx= 0; dy= 0;
+       score -=5;
+    }
+  }
+  
   boolean hit( float x, float y ) {                        //if distance between two balls is less than thirty, set hit = true
     if (  dist( x,y, this.x,this.y ) < 30 ) return true;   //if hit = true, triggers the collision function which swaps velocities
     else return false;
@@ -221,10 +285,14 @@ class Ball {
 class PTable {
   //PROPERTIES
   float left, right, top, bottom, middle;
+  float horizon;
   boolean wall;
   
   //METHODS
   void tableDisplay(){
+    noStroke();
+    fill( 222,184,135 );
+    rect( 0,horizon, width,(height*3/4)+25 );
     fill( 100, 250, 100 );    
     strokeWeight(20);
     stroke( 127, 0, 0 );      // walls of pool talbe
@@ -262,7 +330,7 @@ class Bird {
       drop =false;             //causes the bomb to drop when true
       three.counter = false;   //when true, starts the buffer counter
       three.buffer = 0;        //counts up when counter is true, enables drop to use the same button as fly on subsequent clicks
-      by = 90;
+      by = 70;
       bDY = 2;
       
     }
@@ -305,9 +373,12 @@ class Rat {
   
   float x,y,DX,DY;
   boolean crawl;
+  boolean scoreBuffer;
+  int scoreBufferCounter;
   
   Rat() {
     crawl = false;
+    scoreBuffer = false;
     x = -50;
     y = random(170,height-50);
   }
@@ -343,8 +414,25 @@ class Rat {
     }else if(frame/15 % 2 == 1){
       arc(x-22,y,15,15,PI,TWO_PI);
       arc(x-37,y,15,15,0,PI); 
+    }
   }
+  void clickRat(){
+    if (dist(mouseX,mouseY,x,y)<20){
+         crawl = false;
+        x = -50;
+        y = random(170,height-50);
+        score +=50;
+    }
   }
+      
+  void scoreFix(){
+    if (scoreBuffer == true){
+      scoreBufferCounter +=1;
+      if (scoreBufferCounter>10){
+        scoreBuffer = false;
+      }
+    }
+  }  
 }
 
 class Button {
