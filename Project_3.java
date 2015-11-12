@@ -1,12 +1,13 @@
 ////Nick Ferro
-//// Project 3   11-10-15    Prototyping
+//// Project 3   11-11-15    
 //// Pool table elastic collisions
-//// objects and loops
+//// objects, loops, and arrays
 Ball a,b,c,d,e,q;
 PTable t;
 Button one, two, three, four;
 Bird brd;
 Rat rt;
+Cloud[] cloudList;
 int frame;
 int score;
 
@@ -68,7 +69,14 @@ void setup() {
   brd.by = 75;
   //
   rt= new Rat();
-  
+  //
+  cloudList= new Cloud[7];
+  float cloudX=50;
+  for( int i=0; i<cloudList.length; i++) {
+     cloudList[i]=  new Cloud( cloudX,random(t.horizon-100,t.horizon-25));
+     cloudX += 100;
+  }
+  //
   reset();
 }
 
@@ -88,6 +96,7 @@ void draw() {
   background( 102,178,205 );
   t.tableDisplay();
   drawGrass();
+  drawClouds();
   balls();
   buttons();
   birds();
@@ -103,6 +112,12 @@ void drawGrass(){
     strokeWeight(1);
     line(x, height, random(x-1,x+1), height-15);
     x +=5;
+  }
+}
+
+void drawClouds(){
+   for (int i=0; i<cloudList.length; i++) {
+    cloudList[i].showClouds();
   }
 }
 
@@ -258,7 +273,7 @@ class Ball {
     dx= 0; dy= 0;
   }
   void clickBall(){
-    if (dist( mouseX, mouseY, x,y) < 15){
+    if (dist( mouseX, mouseY, x,y) < 17){
        x=  random( (width/2)+50, t.right );    
        y=  random( t.top, t.bottom );
        dx=  random( -5,5 );
@@ -267,7 +282,7 @@ class Ball {
     }
   }
   void clickCue(){
-    if (dist( mouseX, mouseY, x,y) < 15){
+    if (dist( mouseX, mouseY, x,y) < 17){
        x= width/4;
        y= (t.bottom+t.top)/2;
        dx= 0; dy= 0;
@@ -433,6 +448,35 @@ class Rat {
       }
     }
   }  
+}
+
+class Cloud{
+  
+  float x, y;            
+  
+  Cloud( float x, float y){
+    this.x=x;  this.y=y;
+  }
+ 
+  void showClouds() {
+    stroke(0);
+    fill(255);
+    arc(x,y,30,30,HALF_PI,PI+HALF_PI+QUARTER_PI);
+    arc(x+15,y-15,30,30,HALF_PI+QUARTER_PI,TWO_PI+QUARTER_PI);
+    arc(x+30,y-15,30,30,HALF_PI+QUARTER_PI,TWO_PI+QUARTER_PI);
+    arc(x+45,y,30,30,PI+QUARTER_PI,TWO_PI+HALF_PI);
+    line(x,y+15,x+45,y+15);
+    noStroke();
+    ellipse(x+22,y-16,25,25);
+    ellipse(x+11,y-7,25,25);
+    ellipse(x+33,y-7,25,25);
+    rectMode(CORNER);
+    rect(x-1,y-1,47,15);
+    x++;
+    if (x>width+10){
+      x= random(-200,-100);
+    }
+  }
 }
 
 class Button {
