@@ -89,8 +89,25 @@ void reset() {
   e.reset();
   q.resetCue();
   t.wall = true;
+  resetCheck();
 }
- 
+
+void resetCheck(){
+  if (dist(a.x,a.y,b.x,b.y) <= 30){ reset(); }
+  if (dist(a.x,a.y,c.x,c.y) <= 30){ reset(); }
+  if (dist(a.x,a.y,d.x,d.y) <= 30){ reset(); }
+  if (dist(a.x,a.y,e.x,e.y) <= 30){ reset(); }
+  //
+  if (dist(b.x,b.y,c.x,c.y) <= 30){ reset(); }
+  if (dist(b.x,b.y,d.x,d.y) <= 30){ reset(); }
+  if (dist(b.x,b.y,e.x,e.y) <= 30){ reset(); }
+  //
+  if (dist(c.x,c.y,d.x,d.y) <= 30){ reset(); }
+  if (dist(c.x,c.y,e.x,e.y) <= 30){ reset(); }
+  //
+  if (dist(d.x,d.y,e.x,e.y) <= 30){ reset(); }
+}
+
 //main DRAW function
 void draw() {
   background( 102,178,205 );
@@ -263,8 +280,8 @@ class Ball {
     y=  y+dy;
   }
   void reset() {                //resets the ball on right side random position with random velocity
-    x=  random( (width/2)+50, t.right );    
-    y=  random( t.top, t.bottom );
+    x=  random( (width/2)+60, t.right-10 );    
+    y=  random( t.top+10, t.bottom-10 );
     dx=  random( -5,5 );
     dy=  random( -3,3 );
   }
@@ -275,8 +292,8 @@ class Ball {
   }
   void clickBall(){
     if (dist( mouseX, mouseY, x,y) < 17){
-       x=  random( (width/2)+50, t.right );    
-       y=  random( t.top, t.bottom );
+       x=  random( (width/2)+60, t.right-10 );    
+       y=  random( t.top+10, t.bottom-10 );
        dx=  random( -5,5 );
        dy=  random( -3,3 );
        score -=5;
