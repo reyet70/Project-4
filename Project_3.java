@@ -1,5 +1,5 @@
 ////Nick Ferro
-//// Project 3   11-11-15    
+//// Project 3   11-14-15    
 //// Pool table elastic collisions
 //// objects, loops, and arrays
 Ball a,b,c,d,e,q;
@@ -110,7 +110,7 @@ void drawGrass(){
   strokeWeight(2);
   while (x <= width){
     strokeWeight(1);
-    line(x, height, random(x-1,x+1), height-15);
+    line(x, height, random(x,x+2), height-15);
     x +=5;
   }
 }
@@ -199,6 +199,7 @@ void birds(){
   brd.moveBird();
   brd.showBird();
   brd.bombDrop();
+  brd.explosion();
 }
 
 void rats(){
@@ -325,8 +326,9 @@ class PTable {
 } 
 
 class Bird {
-  float x,y,by,bDY;
-  boolean fly, drop;
+  float x,y,by,bDY,exX,exY;      //x and y for bird, by is bomb's y, bDY si bomb speed, exX and exY for explosion animation
+  boolean fly, drop, explode;
+  int exFrame;
   
   Bird() {
     fly = false;
@@ -372,7 +374,7 @@ class Bird {
   //draws bomb and sends it downward with increasing velocity
   void bombDrop(){
     if (drop == true){
-        noStroke();
+        //noStroke();
         fill(105);
         rect(x,by,10,10);
         ellipse(x+5,by,10,10);
@@ -380,6 +382,85 @@ class Bird {
         triangle(x+5,by, x,by-13, x+10,by-13);
         by += bDY;
         bDY += .25;
+    }
+    if (dist(x,by,rt.x,rt.y)<40){
+      drop = false;
+      rt.crawl = false;
+      explode = true;
+      exFrame = 0;
+      exX=x;
+      exY=by;
+      score +=100;
+      rt.x = -50;
+      rt.y = random(170,height-50);
+  
+      
+    }
+  }
+  
+  //animation for bomb explosion
+  
+  void explosion(){
+    if (explode == true){
+      exFrame = exFrame +1;
+      if (exFrame == 1){
+        fill(255,255,0);
+        ellipse(exX,exY,12,12);
+      }else if(exFrame == 2){
+        fill(255);
+        ellipse(exX,exY,24,24);
+      }else if(exFrame == 3){ 
+        fill(255,255,0);
+        ellipse(exX,exY,36,36);
+      }else if(exFrame == 4){ 
+        fill(255);
+        ellipse(exX,exY,48,48);
+      }else if(exFrame == 5){ 
+        fill(255,255,0);
+        beginShape();
+        vertex(exX-24,exY);
+        bezierVertex(exX-24,exY-13,exX-13,exY-24,exX,exY-24);   //outer top left quadrent
+        vertex(exX,exY-24);
+        bezierVertex(exX+13,exY-24,exX+24,exY-13,exX+24,exY);   //outer top right quadrant
+        vertex(exX+24,exY);
+        bezierVertex(exX+24,exY+13,exX+13,exY+21,exX+3*sqrt(15),exY+21);  ////outer bottom right quadrant
+        vertex(exX+3*sqrt(15),exY+21);
+        bezierVertex(exX+12,exY+17,exX+7,exY+12,exX,exY+12);  //inner right
+        vertex(exX,exY+12);
+        bezierVertex(exX-7,exY+12,exX-12,exY+17,exX-3*sqrt(15),exY+21); //inner left
+        vertex(exX-3*sqrt(15),exY+21);
+        bezierVertex(exX-13,exY+21,exX-24,exY+13,exX-24,exY);     //outer bottom left
+        endShape(CLOSE);
+      }else if(exFrame == 6){ 
+        fill(255);
+        beginShape();
+        vertex(exX-24,exY);
+        bezierVertex(exX-24,exY-13,exX-13,exY-24,exX,exY-24);   //outer top left quadrent
+        vertex(exX,exY-24);
+        bezierVertex(exX+13,exY-24,exX+24,exY-13,exX+24,exY);   //outer top right quadrant
+        vertex(exX+24,exY);
+        bezierVertex(exX+24,exY+13,exX+13,exY+16,exX+18,exY+16);  ////outer bottom right quadrant
+        vertex(exX+18,exY+16);
+        bezierVertex(exX+18,exY+6,exX+10,exY-2,exX,exY-2);      //inner right
+        vertex(exX,exY-2);
+        bezierVertex(exX-10,exY-2,exX-18,exY+6,exX-18,exY+16);  //inner left
+        vertex(exX-18,exY+16);
+        bezierVertex(exX-13,exY+21,exX-24,exY+13,exX-24,exY);  //outer bottom left
+        endShape(CLOSE);
+      }else if(exFrame == 7){ 
+        fill(255,255,0);
+        beginShape();
+        vertex(exX-24,exY);
+        bezierVertex(exX-24,exY-13,exX-13,exY-24,exX,exY-24);   //outer top left quadrent
+        vertex(exX,exY-24);
+        bezierVertex(exX+13,exY-24,exX+24,exY-13,exX+24,exY);   //outer top right quadrant
+        vertex(exX+24,exY);
+        bezierVertex(exX+24,exY-9,exX+13,exY-16,exX,exY-16);  //inner right
+        vertex(exX,exY-16);
+        bezierVertex(exX-13,exY-16,exX-24,exY-9,exX-24,exY);    //inner left
+        endShape(CLOSE);
+        explode = false;
+      }
     }
   }
 }
@@ -540,5 +621,3 @@ class Button {
  }
 }
  
-
-  
