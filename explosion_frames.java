@@ -21,7 +21,7 @@ void draw(){
   vertex(x,y+12);
   bezierVertex(x-7,y+12,x-12,y+17,x-3*sqrt(15),y+21); //inner left
   vertex(x-3*sqrt(15),y+21);
-  bezierVertex(x-13,y+21,x-24,y+13,x-24,y);
+  bezierVertex(x-13,y+21,x-24,y+13,x-24,y);     //outer bottom left
   
   endShape(CLOSE);
 
