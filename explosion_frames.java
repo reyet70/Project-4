@@ -32,6 +32,7 @@ void draw(){
   //ellipse(x,y+24,24,24);
   */
   //frame 6
+  /*
   fill(255);
   beginShape();
   vertex(x-24,y);
@@ -51,9 +52,23 @@ void draw(){
   
   //ellipse(x,y,48,48);
   //ellipse(x,y+16,36,36);
+  */
+  //frame 7
+  fill(255,255,0);
+  beginShape();
+  vertex(x-24,y);
+  bezierVertex(x-24,y-13,x-13,y-24,x,y-24);   //outer top left quadrent
+  vertex(x,y-24);
+  bezierVertex(x+13,y-24,x+24,y-13,x+24,y);   //outer top right quadrant
+  vertex(x+24,y);
+  bezierVertex(x+24,y-9,x+13,y-16,x,y-16);  //inner right
+  vertex(x,y-16);
+  bezierVertex(x-13,y-16,x-24,y-9,x-24,y);    //inner left
   
+  endShape(CLOSE);
   
-  
+  //ellipse(x,y,48,48);
+  //ellipse(x,y+8,48,48);
   
   
 }
