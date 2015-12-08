@@ -1,5 +1,5 @@
-////Nick Ferro
-//// Project 3   11-14-15    
+////Tania Reyes
+//// Project 3   12-7-15    
 //// Pool table elastic collisions
 //// objects, loops, and arrays
 Ball a,b,c,d,e,q;
@@ -7,16 +7,15 @@ PTable t;
 Button one, two, three, four;
 Bird brd;
 Rat rt;
-Cloud[] cloudList;
 int frame;
 int score;
 
 //SETUP: object stuff
 void setup() {
-  size( 720, 480 );
+  size( 720, 580 );
   t= new PTable();
-  t.left=   50;
-  t.right=  width-50;
+  t.left=   45;
+  t.right=  width-45;
   t.top=    150;
   t.bottom= height-50;
   t.middle= t.left + (t.right-t.left) / 2;
@@ -24,35 +23,35 @@ void setup() {
   t.wall=true;
   //
   a=  new Ball();
-  a.r=255;
-  a.b=255;
+  a.r=200;
+  a.b=200;
   a.name=  "1";
   //
   b=  new Ball();
-  b.g=255;
+  b.g=200;
   b.name=  "2";
   //
   c=  new Ball();
-  c.g=255;
-  c.b=255;
+  c.g=200;
+  c.b=200;
   c.name=  "3";
   //
   d=  new Ball();
-  d.g=127;
-  d.b=127;
+  d.g=110;
+  d.b=110;
   d.name=  "4";
   //
   e=  new Ball();
-  e.r=127;
+  e.r=110;
   e.name=  "5";
   //
   q=  new Ball();
-  q.r=255;
-  q.g=255;
-  q.b=255;
+  q.r=200;
+  q.g=200;
+  q.b=200;
   q.name=  " ";
   //
-  one= new Button(50,5);
+  one= new Button(35,5);
   one.words= "Reset";
   //
   two= new Button(140,5);
@@ -70,15 +69,12 @@ void setup() {
   //
   rt= new Rat();
   //
-  cloudList= new Cloud[7];
-  float cloudX=50;
-  for( int i=0; i<cloudList.length; i++) {
-     cloudList[i]=  new Cloud( cloudX,random(t.horizon-100,t.horizon-25));
-     cloudX += 100;
+
+  
   }
   //
-  reset();
-}
+
+
 
 //RESET function for balls
 void reset() {
@@ -113,7 +109,6 @@ void draw() {
   background( 102,178,205 );
   t.tableDisplay();
   drawGrass();
-  drawClouds();
   balls();
   buttons();
   birds();
@@ -132,11 +127,6 @@ void drawGrass(){
   }
 }
 
-void drawClouds(){
-   for (int i=0; i<cloudList.length; i++) {
-    cloudList[i].showClouds();
-  }
-}
 
 // handles the COLLISION, MOVEMENT, and DISPLAY of BALLS
 void balls() {
@@ -194,11 +184,11 @@ void ratCollision( Ball p, Rat q ) {
   if ( p.hit( q.x,q.y ) ) {
     p.dx=0;
     p.dy=0;
-    if (rt.scoreBuffer == false){          //convoluted fix for the problem with the rat collision scoring.
-      score -= 10;                         // b/c the rat doesn't instantly go in the opposite direction of the ball
-      rt.scoreBufferCounter = 0;           // there is a 'collision' for many frames in a row, causing the score to plumet.
-      rt.scoreBuffer = true;               // w/ the fix, the -10 score can only happen every 10 frames, usually enough time 
-    }                                      // for the rat to move away from the ball
+    if (rt.scoreBuffer == false){         
+      score -= 10;                         
+      rt.scoreBufferCounter = 0;           
+      rt.scoreBuffer = true;               
+    }                                      
   }
 }
 
@@ -271,15 +261,15 @@ class Ball {
   }
   void move() {
     if (t.wall) {
-      if (x>t.right-4 || x<t.middle+20) {  dx=  -dx; }    //where the balls bounce off of depending on
-    }else{                                                //whether the wall is engaged or not
+      if (x>t.right-4 || x<t.middle+20) {  dx=  -dx; }    
+    }else{                                                
       if (x>t.right-4 || x<t.left+4) {  dx=  -dx; }
     }
     if (y>t.bottom-4 || y<t.top+4) {  dy=  -dy; }
     x=  x+dx;
     y=  y+dy;
   }
-  void reset() {                //resets the ball on right side random position with random velocity
+  void reset() {                
     x=  random( (width/2)+60, t.right-10 );    
     y=  random( t.top+10, t.bottom-10 );
     dx=  random( -5,5 );
@@ -308,8 +298,8 @@ class Ball {
     }
   }
   
-  boolean hit( float x, float y ) {                        //if distance between two balls is less than thirty, set hit = true
-    if (  dist( x,y, this.x,this.y ) < 30 ) return true;   //if hit = true, triggers the collision function which swaps velocities
+  boolean hit( float x, float y ) {                        
+    if (  dist( x,y, this.x,this.y ) < 30 ) return true;
     else return false;
   }
 }
@@ -343,7 +333,7 @@ class PTable {
 } 
 
 class Bird {
-  float x,y,by,bDY,exX,exY;      //x and y for bird, by is bomb's y, bDY si bomb speed, exX and exY for explosion animation
+  float x,y,by,bDY,exX,exY;      
   boolean fly, drop, explode;
   int exFrame;
   
@@ -353,16 +343,15 @@ class Bird {
     x = -50;
     bDY = 2;
   }
-  // movement for the bird. when the bird crosses the right edge of the screen, it 
-  // resets a ton of variables all tied to the bird flight and bomb droping mechanic
+  
   void moveBird(){
     if (fly)
     x +=4;
     if (x>width+50){
       x= -50;
-      fly = false;             //causes the bird to fly when true
-      drop =false;             //causes the bomb to drop when true
-      three.counter = false;   //when true, starts the buffer counter
+      fly = false;             
+      drop =false;             
+      three.counter = false;   
       three.buffer = 0;        //counts up when counter is true, enables drop to use the same button as fly on subsequent clicks
       by = 70;
       bDY = 2;
@@ -612,9 +601,7 @@ class Button {
     t.wall = false;
   }
  }
- //multifunctional button. Sends the bird flying on the first click
- //and drops a bomb on the second click, then does nothing untill the
- //bird completes its flight.
+ 
  void buttonBird(){
    if (mouseX >x && mouseX<x+80 && mouseY>y && mouseY<y+40){
      brd.fly = true;
@@ -624,8 +611,7 @@ class Button {
      }
    }
  }
- //Buffer counter for the bird button. Button will only enable drop if at least
- //two frames have passed since fly was enabled.
+
  void buttonBirdBuffer(){
    if (counter == true) {
      buffer +=1;
